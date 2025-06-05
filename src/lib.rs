@@ -7,10 +7,9 @@ struct RoverContextServer;
 #[derive(Debug, Deserialize, JsonSchema, Serialize, Default)]
 struct RoverContextServerSettings {
     api_key: String,
-    host: Option<String>,
+    host: String,
 }
 
-const DEFAULT_HOST: &str = "https://api.getrover.com";
 const PACKAGE_NAME: &str = "@getrover/mcp-cli";
 const SERVER_PATH: &str = "node_modules/@getrover/mcp-cli/dist/index.js";
 
@@ -51,10 +50,7 @@ impl zed::Extension for RoverContextServer {
             ],
             env: vec![
                 ("ROVER_API_KEY".into(), settings.api_key),
-                (
-                    "ROVER_HOST".into(),
-                    settings.host.unwrap_or(DEFAULT_HOST.to_string()),
-                ),
+                ("ROVER_HOST".into(), settings.host),
             ],
         })
     }
@@ -67,10 +63,12 @@ impl zed::Extension for RoverContextServer {
         let settings_schema =
             serde_json::to_string(&schemars::schema_for!(RoverContextServerSettings))
                 .map_err(|e| e.to_string())?;
+        let default_settings = include_str!("../config/default_rover_settings.json")
+            .trim()
+            .to_string();
         Ok(Some(zed_extension_api::ContextServerConfiguration {
             settings_schema,
-            default_settings: serde_json::to_string(&RoverContextServerSettings::default())
-                .map_err(|e| e.to_string())?,
+            default_settings,
             installation_instructions: "You'll need to provide your Rover API key. You can generate a key in your user or organization settings.".to_string()
         }))
     }
