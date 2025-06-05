@@ -1,0 +1,13 @@
+[package]
+name = "zed_rover_extension"
+version = "0.1.0"
+edition = "2024"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+schemars = "0.9.0"
+serde = { version = "1.0.219", features = ["derive"] }
+serde_json = "1.0.140"
+zed_extension_api = "0.5.0"
